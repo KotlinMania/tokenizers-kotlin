@@ -16,6 +16,7 @@ public class ResultShunt<T, E : Throwable> internal constructor(
     }
 
     override fun next(): T {
+        if (!hasNext()) throw NoSuchElementException("No more elements in ResultShunt iterator")
         val result = iterator.next()
         return if (result.isSuccess) {
             result.getOrThrow()

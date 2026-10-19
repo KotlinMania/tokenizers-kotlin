@@ -1,7 +1,9 @@
 // port-lint: source utils/progress.rs
 package io.github.kotlinmania.tokenizers.utils
 
-public class ProgressBar(private var len: ULong = 0uL) {
+public class ProgressBar(
+    private var len: ULong = 0uL,
+) {
     public fun setLength(length: ULong) {
         this.len = length
     }

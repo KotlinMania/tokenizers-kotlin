@@ -37,10 +37,17 @@ class TruncationTest {
             typeIds = listOf(0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u),
             tokens = listOf("h", "i", "j", "k", "l", "m", "n", "o"),
             words = listOf(0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u),
-            offsets = listOf(
-                Offsets(0, 1), Offsets(1, 2), Offsets(2, 3), Offsets(3, 4),
-                Offsets(4, 5), Offsets(5, 6), Offsets(6, 7), Offsets(7, 8),
-            ),
+            offsets =
+                listOf(
+                    Offsets(0, 1),
+                    Offsets(1, 2),
+                    Offsets(2, 3),
+                    Offsets(3, 4),
+                    Offsets(4, 5),
+                    Offsets(5, 6),
+                    Offsets(6, 7),
+                    Offsets(7, 8),
+                ),
             specialTokensMask = listOf(0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u),
             attentionMask = listOf(1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u),
         )
@@ -61,12 +68,13 @@ class TruncationTest {
 
     @Test
     fun testTruncateEncodingsLongestFirst() {
-        val params = TruncationParams(
-            maxLength = 7,
-            strategy = TruncationStrategy.LongestFirst,
-            stride = 0,
-            direction = TruncationDirection.Right,
-        )
+        val params =
+            TruncationParams(
+                maxLength = 7,
+                strategy = TruncationStrategy.LongestFirst,
+                stride = 0,
+                direction = TruncationDirection.Right,
+            )
 
         truncateAndAssert(getEmpty(), getEmpty(), params, 0, 0)
         truncateAndAssert(getEmpty(), getShort(), params, 0, 2)
@@ -91,12 +99,13 @@ class TruncationTest {
 
     @Test
     fun testTruncateEncodingsEmpty() {
-        val params = TruncationParams(
-            maxLength = 0,
-            strategy = TruncationStrategy.LongestFirst,
-            stride = 0,
-            direction = TruncationDirection.Right,
-        )
+        val params =
+            TruncationParams(
+                maxLength = 0,
+                strategy = TruncationStrategy.LongestFirst,
+                stride = 0,
+                direction = TruncationDirection.Right,
+            )
 
         truncateAndAssert(getEmpty(), getShort(), params, 0, 0)
         truncateAndAssert(getMedium(), getMedium(), params, 0, 0)

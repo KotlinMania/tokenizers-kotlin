@@ -14,23 +14,25 @@ class PaddingTest {
     @Test
     fun testPadToMultiple() {
         val encodings = getEncodings()
-        val params = PaddingParams(
-            strategy = PaddingStrategy.Fixed(7),
-            direction = PaddingDirection.Right,
-            padToMultipleOf = 8,
-            padId = 0u,
-            padTypeId = 0u,
-            padToken = "[PAD]",
-        )
+        val params =
+            PaddingParams(
+                strategy = PaddingStrategy.Fixed(7),
+                direction = PaddingDirection.Right,
+                padToMultipleOf = 8,
+                padId = 0u,
+                padTypeId = 0u,
+                padToken = "[PAD]",
+            )
         val res = padEncodings(encodings, params)
         assertTrue(res.isSuccess)
         assertTrue(encodings.all { it.getIds().size == 8 })
 
         val encodingsBatch = getEncodings()
-        val paramsBatch = params.copy(
-            strategy = PaddingStrategy.BatchLongest,
-            padToMultipleOf = 6,
-        )
+        val paramsBatch =
+            params.copy(
+                strategy = PaddingStrategy.BatchLongest,
+                padToMultipleOf = 6,
+            )
         val resBatch = padEncodings(encodingsBatch, paramsBatch)
         assertTrue(resBatch.isSuccess)
         assertTrue(encodingsBatch.all { it.getIds().size == 6 })

@@ -32,14 +32,15 @@ internal class Word(
     val symbols: MutableList<Symbol> = mutableListOf(),
 ) {
     public fun add(c: UInt, byteLen: Int) {
-        val (prev, next) = if (symbols.isNotEmpty()) {
-            val last = symbols.last()
-            val len = symbols.size
-            last.next = len
-            Pair(len - 1, -1)
-        } else {
-            Pair(-1, -1)
-        }
+        val (prev, next) =
+            if (symbols.isNotEmpty()) {
+                val last = symbols.last()
+                val len = symbols.size
+                last.next = len
+                Pair(len - 1, -1)
+            } else {
+                Pair(-1, -1)
+            }
 
         symbols.add(
             Symbol(
@@ -64,12 +65,13 @@ internal class Word(
                 val first = symbols[i]
                 val second = symbols[i + 1]
 
-                val newS = Symbol(
-                    c = replacement,
-                    prev = first.prev,
-                    next = second.next,
-                    len = first.len + second.len,
-                )
+                val newS =
+                    Symbol(
+                        c = replacement,
+                        prev = first.prev,
+                        next = second.next,
+                        len = first.len + second.len,
+                    )
 
                 if (i > 0) {
                     changes.add(Pair(PairIds(symbols[i - 1].c, first.c), -1))
@@ -113,11 +115,12 @@ internal class Word(
 
         while (true) {
             val top = queue.pop() ?: break
-            val drop = if (dropout != null) {
-                Random.nextFloat() < dropout
-            } else {
-                false
-            }
+            val drop =
+                if (dropout != null) {
+                    Random.nextFloat() < dropout
+                } else {
+                    false
+                }
 
             if (drop) {
                 skip.add(top)
@@ -204,6 +207,7 @@ internal class Word(
 
     public companion object {
         public fun new(): Word = Word()
+
         public fun withCapacity(capacity: Int): Word = Word(ArrayList(capacity))
     }
 }

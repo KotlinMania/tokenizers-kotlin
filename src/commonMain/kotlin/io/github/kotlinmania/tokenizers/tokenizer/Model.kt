@@ -47,5 +47,6 @@ public interface Model {
  */
 public interface Trainer {
     public fun shouldShowProgress(): Boolean
+
     public fun train(model: Model): Result<List<String>>
 }

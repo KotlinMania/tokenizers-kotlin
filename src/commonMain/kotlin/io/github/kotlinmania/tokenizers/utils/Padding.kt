@@ -8,7 +8,8 @@ import io.github.kotlinmania.tokenizers.tokenizer.Encoding
  */
 public enum class PaddingDirection {
     Left,
-    Right;
+    Right,
+    ;
 
     public fun asStr(): String =
         when (this) {
@@ -19,7 +20,10 @@ public enum class PaddingDirection {
 
 public sealed class PaddingStrategy {
     public data object BatchLongest : PaddingStrategy()
-    public data class Fixed(public val size: Int) : PaddingStrategy()
+
+    public data class Fixed(
+        public val size: Int,
+    ) : PaddingStrategy()
 }
 
 public data class PaddingParams(
@@ -40,10 +44,11 @@ public fun padEncodings(encodings: List<Encoding>, params: PaddingParams): Resul
         return Result.success(Unit)
     }
 
-    var padLength = when (val strategy = params.strategy) {
-        is PaddingStrategy.Fixed -> strategy.size
-        is PaddingStrategy.BatchLongest -> encodings.maxOf { it.getIds().size }
-    }
+    var padLength =
+        when (val strategy = params.strategy) {
+            is PaddingStrategy.Fixed -> strategy.size
+            is PaddingStrategy.BatchLongest -> encodings.maxOf { it.getIds().size }
+        }
 
     val multiple = params.padToMultipleOf
     if (multiple != null && multiple > 0 && padLength % multiple > 0) {

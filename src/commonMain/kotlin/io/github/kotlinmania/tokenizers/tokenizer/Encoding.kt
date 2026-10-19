@@ -19,15 +19,15 @@ public class Encoding(
     overflowing: List<Encoding> = emptyList(),
     sequenceRanges: Map<Int, IntRange> = emptyMap(),
 ) {
-    private var ids: MutableList<UInt> = ids.toMutableList()
-    private var typeIds: MutableList<UInt> = typeIds.toMutableList()
-    private var tokens: MutableList<String> = tokens.toMutableList()
-    private var words: MutableList<UInt?> = words.toMutableList()
-    private var offsets: MutableList<Offsets> = offsets.toMutableList()
-    private var specialTokensMask: MutableList<UInt> = specialTokensMask.toMutableList()
-    private var attentionMask: MutableList<UInt> = attentionMask.toMutableList()
-    private var overflowing: MutableList<Encoding> = overflowing.toMutableList()
-    private var sequenceRanges: MutableMap<Int, IntRange> = sequenceRanges.toMutableMap()
+    private val ids: MutableList<UInt> = ids.toMutableList()
+    private val typeIds: MutableList<UInt> = typeIds.toMutableList()
+    private val tokens: MutableList<String> = tokens.toMutableList()
+    private val words: MutableList<UInt?> = words.toMutableList()
+    private val offsets: MutableList<Offsets> = offsets.toMutableList()
+    private val specialTokensMask: MutableList<UInt> = specialTokensMask.toMutableList()
+    private val attentionMask: MutableList<UInt> = attentionMask.toMutableList()
+    private val overflowing: MutableList<Encoding> = overflowing.toMutableList()
+    private val sequenceRanges: MutableMap<Int, IntRange> = sequenceRanges.toMutableMap()
 
     public fun isEmpty(): Boolean = ids.isEmpty()
 
@@ -63,10 +63,16 @@ public class Encoding(
     public fun getTypeIds(): List<UInt> = typeIds
 
     public fun setTypeIds(typeIds: List<UInt>) {
-        this.typeIds = typeIds.toMutableList()
+        this.typeIds.clear()
+        this.typeIds.addAll(typeIds)
     }
 
     public fun getOffsets(): List<Offsets> = offsets
+
+    public fun setOffsets(offsets: List<Offsets>) {
+        this.offsets.clear()
+        this.offsets.addAll(offsets)
+    }
 
     internal fun getOffsetsMut(): MutableList<Offsets> = offsets
 
@@ -77,7 +83,8 @@ public class Encoding(
     public fun getOverflowing(): List<Encoding> = overflowing
 
     public fun setOverflowing(overflowing: List<Encoding>) {
-        this.overflowing = overflowing.toMutableList()
+        this.overflowing.clear()
+        this.overflowing.addAll(overflowing)
     }
 
     internal fun getOverflowingMut(): MutableList<Encoding> = overflowing
@@ -93,15 +100,14 @@ public class Encoding(
     private fun sequenceRange(sequenceId: Int): IntRange =
         sequenceRanges[sequenceId] ?: (0 until len())
 
-    public fun tokenToSequence(token: Int): Int? {
-        return if (token >= len()) {
+    public fun tokenToSequence(token: Int): Int? =
+        if (token >= len()) {
             null
         } else if (sequenceRanges.isEmpty()) {
             0
         } else {
             sequenceRanges.entries.find { it.value.contains(token) }?.key
         }
-    }
 
     public fun wordToTokens(word: UInt, sequenceId: Int): TokenIndices? {
         val seqRange = sequenceRange(sequenceId)
@@ -204,6 +210,7 @@ public class Encoding(
                     start += offset
                 }
             }
+
             TruncationDirection.Left -> {
                 var stop = encodingLen
                 while (stop > 0) {
@@ -219,17 +226,18 @@ public class Encoding(
 
         val firstRange = partsRanges[0]
         val (firstStart, firstStop) = firstRange
-        val newEncoding = Encoding(
-            ids = ids.subList(firstStart, firstStop).toMutableList(),
-            typeIds = typeIds.subList(firstStart, firstStop).toMutableList(),
-            tokens = tokens.subList(firstStart, firstStop).toMutableList(),
-            words = words.subList(firstStart, firstStop).toMutableList(),
-            offsets = offsets.subList(firstStart, firstStop).toMutableList(),
-            specialTokensMask = specialTokensMask.subList(firstStart, firstStop).toMutableList(),
-            attentionMask = attentionMask.subList(firstStart, firstStop).toMutableList(),
-            overflowing = mutableListOf(),
-            sequenceRanges = mutableMapOf(),
-        )
+        val newEncoding =
+            Encoding(
+                ids = ids.subList(firstStart, firstStop).toMutableList(),
+                typeIds = typeIds.subList(firstStart, firstStop).toMutableList(),
+                tokens = tokens.subList(firstStart, firstStop).toMutableList(),
+                words = words.subList(firstStart, firstStop).toMutableList(),
+                offsets = offsets.subList(firstStart, firstStop).toMutableList(),
+                specialTokensMask = specialTokensMask.subList(firstStart, firstStop).toMutableList(),
+                attentionMask = attentionMask.subList(firstStart, firstStop).toMutableList(),
+                overflowing = mutableListOf(),
+                sequenceRanges = mutableMapOf(),
+            )
 
         for (i in 1 until partsRanges.size) {
             val (s, e) = partsRanges[i]
@@ -248,15 +256,24 @@ public class Encoding(
             )
         }
 
-        this.ids = newEncoding.ids
-        this.typeIds = newEncoding.typeIds
-        this.tokens = newEncoding.tokens
-        this.words = newEncoding.words
-        this.offsets = newEncoding.offsets
-        this.specialTokensMask = newEncoding.specialTokensMask
-        this.attentionMask = newEncoding.attentionMask
-        this.overflowing = newEncoding.overflowing
-        this.sequenceRanges = newEncoding.sequenceRanges
+        this.ids.clear()
+        this.ids.addAll(newEncoding.ids)
+        this.typeIds.clear()
+        this.typeIds.addAll(newEncoding.typeIds)
+        this.tokens.clear()
+        this.tokens.addAll(newEncoding.tokens)
+        this.words.clear()
+        this.words.addAll(newEncoding.words)
+        this.offsets.clear()
+        this.offsets.addAll(newEncoding.offsets)
+        this.specialTokensMask.clear()
+        this.specialTokensMask.addAll(newEncoding.specialTokensMask)
+        this.attentionMask.clear()
+        this.attentionMask.addAll(newEncoding.attentionMask)
+        this.overflowing.clear()
+        this.overflowing.addAll(newEncoding.overflowing)
+        this.sequenceRanges.clear()
+        this.sequenceRanges.putAll(newEncoding.sequenceRanges)
     }
 
     public fun mergeWith(pair: Encoding, growingOffsets: Boolean = false) {
@@ -291,11 +308,12 @@ public class Encoding(
         tokens.addAll(pair.tokens)
         words.addAll(pair.words)
 
-        val startingOffset = if (growingOffsets) {
-            offsets.lastOrNull()?.end ?: 0
-        } else {
-            0
-        }
+        val startingOffset =
+            if (growingOffsets) {
+                offsets.lastOrNull()?.end ?: 0
+            } else {
+                0
+            }
 
         for (off in pair.offsets) {
             offsets.add(Offsets(off.start + startingOffset, off.end + startingOffset))
@@ -303,7 +321,8 @@ public class Encoding(
 
         specialTokensMask.addAll(pair.specialTokensMask)
         attentionMask.addAll(pair.attentionMask)
-        this.overflowing = overflowings
+        this.overflowing.clear()
+        this.overflowing.addAll(overflowings)
     }
 
     public fun pad(
@@ -323,28 +342,22 @@ public class Encoding(
 
         when (direction) {
             PaddingDirection.Left -> {
-                val newIds = MutableList(padLength) { padId }.apply { addAll(ids) }
-                val newTypeIds = MutableList(padLength) { padTypeId }.apply { addAll(typeIds) }
-                val newTokens = MutableList(padLength) { padToken }.apply { addAll(tokens) }
-                val newWords = MutableList<UInt?>(padLength) { null }.apply { addAll(words) }
-                val newAttention = MutableList(padLength) { 0u }.apply { addAll(attentionMask) }
-                val newSpecial = MutableList(padLength) { 1u }.apply { addAll(specialTokensMask) }
-                val newOffsets = MutableList(padLength) { Offsets(0, 0) }.apply { addAll(offsets) }
-
-                ids = newIds
-                typeIds = newTypeIds
-                tokens = newTokens
-                words = newWords
-                attentionMask = newAttention
-                specialTokensMask = newSpecial
-                offsets = newOffsets
+                ids.addAll(0, List(padLength) { padId })
+                typeIds.addAll(0, List(padLength) { padTypeId })
+                tokens.addAll(0, List(padLength) { padToken })
+                words.addAll(0, List(padLength) { null })
+                attentionMask.addAll(0, List(padLength) { 0u })
+                specialTokensMask.addAll(0, List(padLength) { 1u })
+                offsets.addAll(0, List(padLength) { Offsets(0, 0) })
 
                 val updatedRanges = mutableMapOf<Int, IntRange>()
                 for ((seqId, range) in sequenceRanges) {
                     updatedRanges[seqId] = (range.first + padLength)..(range.last + padLength)
                 }
-                sequenceRanges = updatedRanges
+                sequenceRanges.clear()
+                sequenceRanges.putAll(updatedRanges)
             }
+
             PaddingDirection.Right -> {
                 repeat(padLength) {
                     ids.add(padId)

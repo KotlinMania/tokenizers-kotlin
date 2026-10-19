@@ -27,14 +27,18 @@ public interface Pattern {
     public fun findMatches(inside: String): Result<List<PatternMatch>>
 }
 
-public class CharPattern(public val char: Char) : Pattern {
+public class CharPattern(
+    public val char: Char,
+) : Pattern {
     override fun findMatches(inside: String): Result<List<PatternMatch>> {
         val isChar = PredicatePattern { it == char }
         return isChar.findMatches(inside)
     }
 }
 
-public class StringPattern(public val pattern: String) : Pattern {
+public class StringPattern(
+    public val pattern: String,
+) : Pattern {
     override fun findMatches(inside: String): Result<List<PatternMatch>> {
         if (pattern.isEmpty()) {
             val charCount = inside.encodeToByteArray().size
@@ -68,7 +72,9 @@ public class StringPattern(public val pattern: String) : Pattern {
     }
 }
 
-public class RegexPattern(public val regex: Regex) : Pattern {
+public class RegexPattern(
+    public val regex: Regex,
+) : Pattern {
     override fun findMatches(inside: String): Result<List<PatternMatch>> {
         val byteTable = utf8CharOffsets(inside)
         val totalBytes = byteTable[inside.length]
@@ -98,7 +104,9 @@ public class RegexPattern(public val regex: Regex) : Pattern {
     }
 }
 
-internal class PredicatePattern(val predicate: CharPredicate) : Pattern {
+internal class PredicatePattern(
+    val predicate: CharPredicate,
+) : Pattern {
     override fun findMatches(inside: String): Result<List<PatternMatch>> {
         if (inside.isEmpty()) {
             return Result.success(listOf(PatternMatch(Offsets(0, 0), false)))
@@ -113,11 +121,12 @@ internal class PredicatePattern(val predicate: CharPredicate) : Pattern {
         while (i < inside.length) {
             val c = inside[i]
             val startByte = byteTable[i]
-            val nextI = if (c.isHighSurrogate() && i + 1 < inside.length && inside[i + 1].isLowSurrogate()) {
-                i + 2
-            } else {
-                i + 1
-            }
+            val nextI =
+                if (c.isHighSurrogate() && i + 1 < inside.length && inside[i + 1].isLowSurrogate()) {
+                    i + 2
+                } else {
+                    i + 1
+                }
             val endByte = byteTable[nextI]
 
             if (predicate.test(c)) {
@@ -143,7 +152,9 @@ internal class PredicatePattern(val predicate: CharPredicate) : Pattern {
  * for example when we use a regex that matches words instead of a delimiter,
  * and we want to match the delimiter.
  */
-public class Invert<P : Pattern>(public val pattern: P) : Pattern {
+public class Invert<P : Pattern>(
+    public val pattern: P,
+) : Pattern {
     override fun findMatches(inside: String): Result<List<PatternMatch>> {
         val result = pattern.findMatches(inside)
         return result.map { list ->
@@ -163,20 +174,22 @@ internal fun utf8CharOffsets(s: String): IntArray {
     while (i < s.length) {
         table[i] = byteOffset
         val c = s[i]
-        val codePoint = if (c.isHighSurrogate() && i + 1 < s.length && s[i + 1].isLowSurrogate()) {
-            val high = c.code
-            val low = s[i + 1].code
-            0x10000 + ((high - 0xD800) shl 10) + (low - 0xDC00)
-        } else {
-            c.code
-        }
+        val codePoint =
+            if (c.isHighSurrogate() && i + 1 < s.length && s[i + 1].isLowSurrogate()) {
+                val high = c.code
+                val low = s[i + 1].code
+                0x10000 + ((high - 0xD800) shl 10) + (low - 0xDC00)
+            } else {
+                c.code
+            }
 
-        val bytes = when {
-            codePoint <= 0x7F -> 1
-            codePoint <= 0x7FF -> 2
-            codePoint <= 0xFFFF -> 3
-            else -> 4
-        }
+        val bytes =
+            when {
+                codePoint <= 0x7F -> 1
+                codePoint <= 0x7FF -> 2
+                codePoint <= 0xFFFF -> 3
+                else -> 4
+            }
 
         byteOffset += bytes
         if (codePoint > 0xFFFF) {

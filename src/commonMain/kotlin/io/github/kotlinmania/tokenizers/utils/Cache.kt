@@ -11,7 +11,9 @@ public const val MAX_LENGTH: Int = 256
  * concurrently but won't block if another thread is writing.
  * Both get and set are not guaranteed to actually get or set.
  */
-public class Cache<K : Any, V : Any>(public var capacity: Int) {
+public class Cache<K : Any, V : Any>(
+    public var capacity: Int,
+) {
     private val map: AtomicReference<Map<K, V>> = AtomicReference(emptyMap())
 
     public constructor() : this(DEFAULT_CACHE_CAPACITY)

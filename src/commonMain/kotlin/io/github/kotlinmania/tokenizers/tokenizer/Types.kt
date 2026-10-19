@@ -8,6 +8,7 @@ public data class Offsets(
     public val end: Int,
 ) {
     internal constructor(pair: Pair<Int, Int>) : this(pair.first, pair.second)
+
     internal fun toPair(): Pair<Int, Int> = Pair(start, end)
 }
 

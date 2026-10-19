@@ -98,11 +98,12 @@ public class BpeBuilder private constructor(
             vocabR[v] = k
         }
 
-        val cache = if (config.cacheCapacity > 0) {
-            Cache<String, Word>(config.cacheCapacity)
-        } else {
-            null
-        }
+        val cache =
+            if (config.cacheCapacity > 0) {
+                Cache<String, Word>(config.cacheCapacity)
+            } else {
+                null
+            }
 
         val prefixLen = config.continuingSubwordPrefix?.length ?: 0
         val mergeMap = mutableMapOf<PairIds, Pair<UInt, UInt>>()
@@ -160,7 +161,6 @@ public class BPE internal constructor(
     public val byteFallback: Boolean = false,
     public val ignoreMerges: Boolean = false,
 ) : Model {
-
     public fun clearCache() {
         cache?.clear()
     }
@@ -173,7 +173,6 @@ public class BPE internal constructor(
 
     override fun getVocabSize(): Int = vocab.size
 
-
     internal fun mergeWord(w: String): Result<Word> {
         val word = Word.withCapacity(w.length)
         var unk: Pair<UInt, Int>? = null
@@ -182,15 +181,16 @@ public class BPE internal constructor(
         var i = 0
         while (i < w.length) {
             val c = w[i]
-            val s = if (c.isHighSurrogate() && i + 1 < w.length && w[i + 1].isLowSurrogate()) {
-                val str = w.substring(i, i + 2)
-                i += 2
-                str
-            } else {
-                val str = w.substring(i, i + 1)
-                i += 1
-                str
-            }
+            val s =
+                if (c.isHighSurrogate() && i + 1 < w.length && w[i + 1].isLowSurrogate()) {
+                    val str = w.substring(i, i + 2)
+                    i += 2
+                    str
+                } else {
+                    val str = w.substring(i, i + 1)
+                    i += 1
+                    str
+                }
             codePoints.add(s)
         }
 
@@ -247,18 +247,20 @@ public class BPE internal constructor(
 
                 val currentUnkToken = unkToken
                 if (currentUnkToken != null) {
-                    val unkId = vocab[currentUnkToken]
-                        ?: return Result.failure(BpeError.UnkTokenOutOfVocabulary(currentUnkToken))
+                    val unkId =
+                        vocab[currentUnkToken]
+                            ?: return Result.failure(BpeError.UnkTokenOutOfVocabulary(currentUnkToken))
 
                     val currentUnk = unk
-                    unk = if (currentUnk != null && fuseUnk) {
-                        Pair(currentUnk.first, currentUnk.second + byteLen)
-                    } else if (currentUnk != null) {
-                        word.add(currentUnk.first, currentUnk.second)
-                        Pair(unkId, byteLen)
-                    } else {
-                        Pair(unkId, byteLen)
-                    }
+                    unk =
+                        if (currentUnk != null && fuseUnk) {
+                            Pair(currentUnk.first, currentUnk.second + byteLen)
+                        } else if (currentUnk != null) {
+                            word.add(currentUnk.first, currentUnk.second)
+                            Pair(unkId, byteLen)
+                        } else {
+                            Pair(unkId, byteLen)
+                        }
                 }
             }
         }
@@ -278,7 +280,7 @@ public class BPE internal constructor(
         val tokens = mutableListOf<Token>()
         for (i in chars.indices) {
             val id = chars[i]
-            val value = vocabR[id] ?: ""
+            val value = vocabR[id].orEmpty()
             tokens.add(Token.new(id, value, offsets[i]))
         }
         return tokens
@@ -333,6 +335,7 @@ public class BPE internal constructor(
     override fun getTrainer(): Trainer =
         object : Trainer {
             override fun shouldShowProgress(): Boolean = false
+
             override fun train(model: Model): Result<List<String>> = Result.success(emptyList())
         }
 

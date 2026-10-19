@@ -6,7 +6,8 @@ import kotlin.math.max
 
 public enum class TruncationDirection {
     Left,
-    Right;
+    Right,
+    ;
 
     public fun asStr(): String =
         when (this) {
@@ -22,7 +23,8 @@ public enum class TruncationDirection {
 public enum class TruncationStrategy {
     LongestFirst,
     OnlyFirst,
-    OnlySecond;
+    OnlySecond,
+    ;
 
     public fun asStr(): String =
         when (this) {
@@ -36,7 +38,9 @@ public enum class TruncationStrategy {
     }
 }
 
-public sealed class TruncationError(message: String) : Exception(message) {
+public sealed class TruncationError(
+    message: String,
+) : Exception(message) {
     public data object SecondSequenceNotProvided :
         TruncationError("Truncation error: Second sequence not provided")
 
@@ -65,8 +69,8 @@ public fun truncateEncodings(
     pairEncoding: Encoding?,
     params: TruncationParams,
 ): Result<TruncatedEncodings> {
-    var enc = encoding
-    var pairEnc = pairEncoding
+    val enc = encoding
+    val pairEnc = pairEncoding
 
     if (params.maxLength == 0) {
         enc.truncate(0, params.stride, params.direction)
@@ -75,11 +79,12 @@ public fun truncateEncodings(
     }
 
     val totalLength = enc.getIds().size + (pairEnc?.getIds()?.size ?: 0)
-    val toRemove = if (totalLength > params.maxLength) {
-        totalLength - params.maxLength
-    } else {
-        return Result.success(TruncatedEncodings(enc, pairEnc))
-    }
+    val toRemove =
+        if (totalLength > params.maxLength) {
+            totalLength - params.maxLength
+        } else {
+            return Result.success(TruncatedEncodings(enc, pairEnc))
+        }
 
     when (params.strategy) {
         TruncationStrategy.LongestFirst -> {
@@ -118,6 +123,7 @@ public fun truncateEncodings(
                 enc.truncate(totalLength - toRemove, params.stride, params.direction)
             }
         }
+
         TruncationStrategy.OnlyFirst -> {
             val targetLen = enc.getIds().size
             if (targetLen > toRemove) {
@@ -126,6 +132,7 @@ public fun truncateEncodings(
                 return Result.failure(TruncationError.SequenceTooShort)
             }
         }
+
         TruncationStrategy.OnlySecond -> {
             val target = pairEnc ?: return Result.failure(TruncationError.SecondSequenceNotProvided)
             val targetLen = target.getIds().size
